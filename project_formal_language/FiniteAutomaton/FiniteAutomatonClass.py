@@ -66,7 +66,34 @@ class FiniteAutomaton:
                         closure.add(next_[0])
                         queue.append(next_[0])
             return closure
-    
+
+        def transform_delta(transitions):
+            new_transitions = {}
+            for key, value in transitions.items():
+                state = ''.join(key[0])
+                symbol = key[1]
+                if state not in new_transitions:
+                    new_transitions[state] = {}
+                if isinstance(value, tuple):
+                    new_state = ''.join(value)
+                    new_transitions[state][symbol] = new_state
+                else:
+                    new_state1, new_state2 = value
+                    new_transitions[state][symbol] = new_state1
+                    new_transitions[state]['1'] = new_state2
+            return new_transitions
+
+        def transform_states(dfa_states):
+            new_dfa_states = []
+            for state in dfa_states:
+                new_state = list(state)
+                new_comb = ""
+                for trans in new_state:
+                    new_comb = new_comb + trans
+                new_dfa_states.append(new_comb)
+
+            return set(new_dfa_states)
+
         dfa_states = []
         dfa_transitions = {}
         dfa_final_states = []
@@ -87,4 +114,9 @@ class FiniteAutomaton:
                     dfa_transitions[(tuple(current_state), symbol)] = tuple(next_state)
             if any(nfa_state in self.F for nfa_state in current_state):
                 dfa_final_states.append(tuple(current_state))
-        return dfa_states, self.Sigma, dfa_transitions, dfa_final_states
+
+            dfa_mod_transitions = transform_delta(dfa_transitions)
+            dfa_mod_states = transform_states(dfa_states)
+            self.Sigma = set(self.Sigma)
+            dfa_mod_final_states = transform_states(dfa_final_states)
+        return dfa_mod_states, self.Sigma, dfa_mod_transitions, dfa_mod_final_states

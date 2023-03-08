@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/../.idea/LFAF_labs-master.iml" filepath="$PROJECT_DIR$/../.idea/LFAF_labs-master.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/project_formal_language.iml" filepath="$PROJECT_DIR$/.idea/project_formal_language.iml" />
     </modules>
   </component>

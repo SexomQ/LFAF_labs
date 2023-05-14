@@ -1,14 +1,5 @@
 import re
-
-class Token:
-    def __init__(self, kind, value, line, column):
-        self.kind = kind
-        self.value = value
-        self.line = line
-        self.column = column
-    
-    def print_token(self):
-        print(f"Token(type={self.kind}, value='{self.value}', line={self.line}, column={self.column})")
+from Lexer.TokenClass import Token
 
 class Lexer:
     def __init__(self, code):
@@ -31,6 +22,7 @@ class Lexer:
         tok_regex = '|'.join('(?P<%s>%s)' % pair for pair in token_specification)
         line_num = 1
         line_start = 0
+        tokens = []
         for mo in re.finditer(tok_regex, code):
             kind = mo.lastgroup
             value = mo.group()
@@ -48,4 +40,5 @@ class Lexer:
             elif kind == 'MISMATCH':
                 raise RuntimeError(f'{value} unexpected on line {line_num}')
             result = Token(kind, value, line_num, column)
-            result.print_token()
+            tokens.append(result)
+        return tokens

@@ -1,4 +1,6 @@
 from Parser.ParseTreeNodeClass import ParseTreeNode
+from project_formal_language.Lexer.TokenClass import Token
+
 
 class Parser:
     def __init__(self, tokens):
@@ -6,7 +8,8 @@ class Parser:
         self.current_token_index = 0
         
     def parse(self):
-        return self.select_statement()
+        if self.current_token() == 'SELECT':
+            return self.select_statement()
     
     def select_statement(self):
         node = ParseTreeNode('SELECT_STATEMENT')

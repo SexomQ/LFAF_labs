@@ -11,6 +11,7 @@ class ParseTreeNode:
 
     def print_tree(self, level=0):
         result = "\t" * level + f"{self.kind}"
+        print(result)
         if self.value:
             result += f": {self.value}"
         result += "\n"

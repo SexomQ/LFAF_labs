@@ -33,16 +33,9 @@ Overall, building a parser involves a combination of language theory, algorithms
    3. Implement a simple parser program that could extract the syntactic information from the input text.
 
 ## Implementation description
-* First of all I implemented a tree type class to define the parsing tree. It has 2 methods: add_child() and print_tree().
+First of all I implemented a tree type class (__*ParseTreeNode*__) to define the parsing tree. It has 2 methods: add_child() and print_tree().
+The main method, print_tree(), returns a parse tree. It travers all the nodes and its children, colecting them in a string.
 ```jupyterpython
-class ParseTreeNode:
-    def __init__(self, kind, value=None, children=None, line=0, column=0):
-        self.kind = kind
-        self.value = value
-        self.children = children or []
-        self.line = line
-        self.column = column
-
     def add_child(self, child):
         self.children.append(child)
 
@@ -56,14 +49,15 @@ class ParseTreeNode:
             result += child.print_tree(level + 1)
         return result
 ```
-* Next, I implemented the parser that has 5 main methods to parse a string: parse(), expect(), advance() and current_token().
-  * The parse() method get the string and determine what it has to parse next.
+Next, I implemented the parser that has 5 main methods to parse a string: parse(), expect(), advance() and current_token().
+
+The parse() method get the string and determine what it has to parse next.
   ```jupyterpython
    def parse(self):
        if self.current_token() == 'SELECT':
            return self.select_statement()
    ```
-  * The expect() method checks if the current token matches one of the expected kinds and returns a parse tree node representing the token if it does. If the current token does not match any of the expected kinds, it raises a RuntimeError.
+The expect() method checks if the current token matches one of the expected kinds and returns a parse tree node representing the token if it does. If the current token does not match any of the expected kinds, it raises a RuntimeError.
   ```jupyterpython
    def expect(self, *expected_kinds):
      if self.current_token().kind not in expected_kinds:
@@ -72,12 +66,12 @@ class ParseTreeNode:
      self.advance()
      return node
    ```
-  * The advance() method moves on the next token.
+The advance() method moves on the next token.
   ```jupyterpython
     def advance(self):
      self.current_token_index += 1
    ```
-  * The current_token() and peek() methods help to understand what are the current and next token in the list.
+The current_token() and peek() methods help to understand what are the current and next token in the list.
   ```jupyterpython
     def current_token(self):
         return self.tokens[self.current_token_index]
@@ -88,8 +82,9 @@ class ParseTreeNode:
         else:
             return Token('', '', 0, 0)
    ```
-* Then, I wrote the logic for SELECT statement parsing:
-    * select_statement(self): This function represents the parsing of a SELECT statement in SQL. It creates a parse tree node with the label 'SELECT_STATEMENT'. It adds child nodes based on the structure of the SELECT statement.
+Then, I wrote the logic for SELECT statement parsing:
+    
+select_statement(self): This function represents the parsing of a SELECT statement in SQL. It creates a parse tree node with the label 'SELECT_STATEMENT'. It adds child nodes based on the structure of the SELECT statement.
   ```jupyterpython
     def select_statement(self):
         node = ParseTreeNode('SELECT_STATEMENT')
@@ -106,8 +101,8 @@ class ParseTreeNode:
             node.add_child(self.order_by_clause())
         node.add_child(self.expect('END'))
         return node
-    ```
-    * where_clause(self): This function represents the parsing of a WHERE clause in SQL. It checks if there are more tokens available and creates a parse tree node with the label 'WHERE_CLAUSE' if the current token is 'WHERE'. It adds child nodes for the 'WHERE' token and the expression (handled by expression()).
+```
+where_clause(self): This function represents the parsing of a WHERE clause in SQL. It checks if there are more tokens available and creates a parse tree node with the label 'WHERE_CLAUSE' if the current token is 'WHERE'. It adds child nodes for the 'WHERE' token and the expression (handled by expression()).
   ```jupyterpython
     def where_clause(self):
         if self.current_token_index + 1 < len(self.tokens):
@@ -116,8 +111,8 @@ class ParseTreeNode:
                 node.add_child(self.expect('WHERE'))
                 node.add_child(self.expression())
             return node
-    ```
-    * order_by_clause(self): This function represents the parsing of an ORDER BY clause in SQL. It checks if there are more tokens available and creates a parse tree node with the label 'ORDER_BY_CLAUSE' if the current token is 'ORDER_BY'. It adds child nodes for the 'ORDER_BY' token and the 'ID' token.
+```
+order_by_clause(self): This function represents the parsing of an ORDER BY clause in SQL. It checks if there are more tokens available and creates a parse tree node with the label 'ORDER_BY_CLAUSE' if the current token is 'ORDER_BY'. It adds child nodes for the 'ORDER_BY' token and the 'ID' token.
   ```jupyterpython
      def order_by_clause(self):
         if self.current_token_index + 1 < len(self.tokens):
@@ -126,8 +121,8 @@ class ParseTreeNode:
                 node.add_child(self.expect('ORDER_BY'))
                 node.add_child(self.expect('ID'))
             return node
-    ```
-    * expression(self): This function represents the parsing of an expression in SQL. It creates a parse tree node with the label 'EXPRESSION' and adds child nodes for an 'ID' token, a 'COMPARATOR' token, and a 'NUMBER' token.
+```
+expression(self): This function represents the parsing of an expression in SQL. It creates a parse tree node with the label 'EXPRESSION' and adds child nodes for an 'ID' token, a 'COMPARATOR' token, and a 'NUMBER' token.
   ```jupyterpython
     def expression(self):
         node = ParseTreeNode('EXPRESSION')
@@ -135,8 +130,8 @@ class ParseTreeNode:
         node.add_child(self.expect('COMPARATOR'))
         node.add_child(self.expect('NUMBER'))
         return node
-    ```
-    * list_ids(self): This function represents the parsing of a list of identifiers in SQL, such as column names.
+```
+list_ids(self): This function represents the parsing of a list of identifiers in SQL, such as column names.
   ```jupyterpython
     def list_ids(self):
         node = ParseTreeNode('COLUMN_LIST')
@@ -149,7 +144,7 @@ class ParseTreeNode:
             
         is_id()
         return node
-    ```
+```
 ## Conclusions / Screenshots / Results
 
 By implementing this parser, it becomes possible to validate and extract information from SQL statements, providing a foundation for further processing or analysis. The parse tree can be utilized to understand the structure of the SQL statement, perform semantic analysis, and potentially generate executable code or perform optimizations. The code snippet focuses on parsing the SELECT statement, WHERE clause, ORDER BY clause, and simple expressions. In a real-world scenario, a SQL parser would need to handle a broader range of SQL syntax, including other types of statements, subqueries, complex expressions, joins, and more.

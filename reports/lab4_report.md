@@ -26,7 +26,7 @@ Every grammar in Chomsky normal form is context-free, and conversely, every cont
     4. Also, another BONUS point would be given if the student will make the aforementioned function to accept any grammar, not only the one from the student's variant.
 
 ## Implementation description
-* ### Step 1. Elimination of epsilon:
+### Step 1. Elimination of epsilon:
   #### The algorithm consists of three steps:
    1. Identify all non-terminals that derive epsilon. This is done by iterating over all non-terminals and their productions, and checking if any of them derive the empty string (''). If so, the non-terminal is added to a set called epsilons.
    2. Generate new productions that exclude epsilon productions. This is done by iterating over all productions, and for each production, checking if any of its symbols can be replaced with the empty string. If so, a new production is generated where that symbol is removed. If the resulting right-hand side is also the empty string and the left-hand side is not already in epsilons, the new production is discarded. Otherwise, the new production is added to the set of productions for the corresponding non-terminal.
@@ -36,11 +36,6 @@ Every grammar in Chomsky normal form is context-free, and conversely, every cont
 
 ```jupyterpython
 def eliminate_epsilon(self):
-        VN = self.VN
-        VT = self.VT
-        P = self.P
-        S = self.S
-        
         if self.eps_P is None:
             # Step 1: Identify all non-terminals that derive epsilon
             epsilons = set()
@@ -81,8 +76,7 @@ def eliminate_epsilon(self):
             
         return self.eps_P
 ```
-
-* ### Step 2. Elimination of renamings:
+### Step 2. Elimination of renamings:
    #### The algorithm consists of three steps:
 
   1. Remove unit rules of the form A -> A. This is done by iterating over all non-terminals, and for each non-terminal, checking if it has a production of the form A -> A. If so, this production is removed from the set of productions for the non-terminal.
@@ -93,10 +87,6 @@ The resulting set of productions is returned as the output CFG. The method store
 
 ```jupyterpython
 def eliminate_unit_rules(self):
-        VN = self.VN
-        VT = self.VT
-        P = self.eps_P
-        S = self.S
         
         if self.unit_P is None:
             # Step 1: Remove unit rules of the form A -> A
@@ -123,7 +113,7 @@ def eliminate_unit_rules(self):
         return self.unit_P
 ```
 
-* ### Step 3. Elimination of non-productive symbols:
+### Step 3. Elimination of non-productive symbols:
    #### The algorithm consists of three steps:
 
    1. Initialize the set of productive symbols as the set of terminals.
@@ -135,10 +125,6 @@ The resulting set of productions is returned as the output CFG. The method store
 
 ```jupyterpython
     def find_productive_symbols(self):
-        VN = self.VN
-        VT = self.VT
-        P = self.unit_P
-        S = self.S
         
         if self.prod_P is None:
             productive = set(VT)
@@ -158,7 +144,7 @@ The resulting set of productions is returned as the output CFG. The method store
         return self.prod_P
 ```
 
-* ### Step 4. Elimination of inaccessible symbols:
+### Step 4. Elimination of inaccessible symbols:
    #### The algorithm consists of three steps:
    1. Initialize the set of accessible non-terminals with the start symbol.
    2. For each non-terminal in the accessible set, add any non-terminals that appear in its productions to the accessible set.
@@ -168,10 +154,6 @@ The resulting set of productions is returned as the output CFG. The method store
 
 ```jupyterpython
 def get_accessible_symbols(self):
-        VN = self.VN
-        VT = self.VT
-        P = self.prod_P
-        S = self.S
         
         if self.acc_P is None:
             accessible = []
@@ -192,50 +174,30 @@ def get_accessible_symbols(self):
         return self.acc_P
 ```
 
-* ### Step 5. Obtain the Chomsky Normal Form:
+### Step 5. Obtain the Chomsky Normal Form:
    The function first initializes some variables with the current production rules and the set of nonterminal and terminal symbols. It then checks whether the grammar is already in Chomsky normal form; if so, it simply returns the current set of production rules.
 
-    If the grammar is not already in CNF, the function proceeds to iterate through the production rules, replacing any production rule of length greater than two with a series of productions in CNF. To do this, it creates new nonterminal symbols to represent any terminals, and replaces the original production rule with a sequence of production rules in which each right-hand side consists of either two nonterminal symbols or a single terminal symbol.
+If the grammar is not already in CNF, the function proceeds to iterate through the production rules, replacing any production rule of length greater than two with a series of productions in CNF. To do this, it creates new nonterminal symbols to represent any terminals, and replaces the original production rule with a sequence of production rules in which each right-hand side consists of either two nonterminal symbols or a single terminal symbol.
 
-    The function continues to iterate through the production rules until it has replaced all non-CNF production rules. Finally, it returns the resulting set of production rules and the set of nonterminal symbols in the CNF grammar.
+The function continues to iterate through the production rules until it has replaced all non-CNF production rules. Finally, it returns the resulting set of production rules and the set of nonterminal symbols in the CNF grammar.
 
 
 ```jupyterpython
 def chomsky_norm_form(self):
-        VN = self.VN
-        VT = self.VT
-        P = self.acc_P
-        S = self.S
-        
-        if self.chomsky_P is None:
-            new_production = {}
-            new_variables = {}
-            new_VN = []
-
-            new_production = P.copy()
-            possible_variables = ['G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
-            new_VN = VN.copy()
-            changed = True
-
+       ...
             while changed == True:
                 changed = False
-        #         print(new_production)
                 for state, production in new_production.items():
-        #             print(state)
-        #             print(new_variables)
                     for ind, prod in enumerate(production):
                         if len(prod) <= 2:
                             if len(prod) == 1:
                                 continue
                             else:
-        #                         print("passed")
                                 if prod[0] in new_VN and prod[1] in new_VN:
                                     continue
                                 else:
                                     for ind_var, var in enumerate(prod):
-        #                                 print(var, "---------------------")
                                         if var not in new_variables and var in VT:
-        #                                     print(var, "found")
                                             new_variables[var] = possible_variables[-1]
                                             new_production[state][ind] = new_production[state][ind].replace(new_production[state][ind][ind_var], possible_variables[-1])      
                                             new_VN.append(possible_variables[-1])
@@ -245,49 +207,10 @@ def chomsky_norm_form(self):
                                             new_production[state][ind] = new_production[state][ind].replace(new_production[state][ind][ind_var], new_variables[new_production[state][ind][ind_var]])
                                             changed = True
                         elif len(prod) > 2:
-        #                     print(prod)
-        #                     print(new_VN)
-                            if prod[0] in new_VN and prod[1] in new_VN and (prod[0] + prod[1]) not in new_variables:
-                                new_variables[new_production[state][ind][:2]] = possible_variables[-1] # This is the first
-                                new_production[state][ind] = new_production[state][ind].replace(prod[0] + prod[1], possible_variables[-1])
-                                new_VN.append(possible_variables[-1])
-                                possible_variables.pop()
-                                changed = True
-        #                         print("here")
-
-                            elif prod[0] in new_VN and prod[1] in new_VN and (prod[0] + prod[1]) in new_variables:
-                                new_production[state][ind] = new_production[state][ind].replace(prod[0] + prod[1], new_variables[prod[0] + prod[1]])
-                                changed = True
-
-                            elif prod[0] in new_VN and prod[1] not in new_VN and prod[1] not in new_variables:
-        #                         print("this")
-                                new_variables[new_production[state][ind][1]] = possible_variables[-1]
-                                new_production[state][ind] = new_production[state][ind].replace(new_production[state][ind], prod[1] + possible_variables[-1]) 
-                                new_VN.append(possible_variables[-1])
-                                possible_variables.pop()
-                                changed = True
-
-                            elif prod[0] in new_VN and prod[1] not in new_VN and prod[1] in new_variables:
-        #                         print("that")
-                                new_production[state][ind] = new_production[state][ind].replace(new_production[state][ind], prod[0] + new_variables[prod[1]])
-                                changed = True
-
-                            elif prod[1] in new_VN and prod[0] not in new_VN and prod[0] not in new_variables:
-        #                         print("this_2")
-                                new_variables[new_production[state][ind][0]] = possible_variables[-1]
-                                new_production[state][ind] = new_production[state][ind].replace(new_production[state][ind], possible_variables[-1] + prod[1]) 
-                                new_VN.append(possible_variables[-1])
-                                possible_variables.pop()
-                                changed = True
-
-                            elif prod[1] in new_VN and prod[0] not in new_VN and prod[0] in new_variables:
-        #                         print("this_3")
-                                new_production[state][ind] = new_production[state][ind].replace(new_production[state][ind], new_variables[prod[1]] + prod[1])
-                                changed = True          
-                            else:
-                                continue
-                                changed = False
-
+                          ...
+                          # (logic if the length of the produciton if larger than 2)
+                          ...
+                   
             for old_var, new_var in new_variables.items():
                 new_production[new_var] = old_var
             
@@ -296,8 +219,8 @@ def chomsky_norm_form(self):
             
         return self.chomsky_VN, self.chomsky_P
 ```
-* ### Final Transformation:
-    In the end there is a "transform" function that runs all the methods provided.
+### Final Transformation:
+In the end there is a "transform" function that runs all the methods provided.
 ```jupyterpython
 def transform(self):
         _ = self.eliminate_epsilon()
@@ -313,7 +236,7 @@ def transform(self):
 In conclusion, implementing Chomsky Normal Form conversion algorithm can be a complex task, as demonstrated by the code provided. However, the benefits of converting a context-free grammar to CNF include simplifying the grammar and facilitating parsing algorithms. The code provided appears to handle the conversion process effectively, utilizing a set of rules and heuristics to transform the grammar into CNF (said by ChatGPT :) ) That means my implementation should work for almost any context free grammar. Overall, this implementation serves as a useful tool for anyone working with context-free grammars and parsing algorithms.
 
 <b>Results:</b>
-* Chomsky conversion test:
+Chomsky conversion test:
 
 ```jupyterpython
 VN = ['S', 'A', 'B', 'C', 'E']
